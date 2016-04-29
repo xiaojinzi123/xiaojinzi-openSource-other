@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.cxj.tabhost.MainActivity">
+
+    <RadioGroup
+        android:id="@+id/act_main_rg"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:background="#EEEEEE"
+        android:orientation="vertical">
+
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:button="@null"
+            android:drawableRight="@drawable/radiobutton_home_bg"
+            android:gravity="center"
+            android:text="首\n页" />
+
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:button="@null"
+            android:drawableRight="@drawable/radiobutton_demo_bg"
+            android:gravity="center"
+            android:text="测\n试" />
+
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:button="@null"
+            android:drawableRight="@drawable/radiobutton_my_bg"
+            android:gravity="center"
+            android:text="我\n的" />
+
+    </RadioGroup>
+
+</RelativeLayout>
