@@ -37,7 +37,7 @@ public class LocalImageLoader {
             String path = holder.path;
             if (imageView.getTag().toString().equals(path)) {
                 imageView.setImageBitmap(bm);
-            }else {
+            } else {
 //                System.out.println("不同");
             }
         }
@@ -78,17 +78,20 @@ public class LocalImageLoader {
                 @Override
                 public void run() {
                     LayoutParams lp = imageView.getLayoutParams();
+                    //获取本地的图片
                     Bitmap bm = ImageUtil.decodeLocalImage(imageLocalPath, lp.width, lp.height);
-//                    Bitmap bm = BitmapFactory.decodeFile(imageLocalPath);
-                    //添加到一级缓存
-                    addBitmapToLruCache(imageLocalPath, bm);
-                    ImgBeanHolder holder = new ImgBeanHolder();
-                    holder.bitmap = mLruCache.get(imageLocalPath);
-                    holder.imageView = imageView;
-                    holder.path = imageLocalPath;
-                    Message message = Message.obtain();
-                    message.obj = holder;
-                    h.sendMessage(message);
+                    if (bm != null) {
+                        //添加到一级缓存
+                        addBitmapToLruCache(imageLocalPath, bm);
+                        ImgBeanHolder holder = new ImgBeanHolder();
+                        holder.bitmap = mLruCache.get(imageLocalPath);
+                        holder.imageView = imageView;
+                        holder.path = imageLocalPath;
+                        Message message = Message.obtain();
+                        message.obj = holder;
+                        h.sendMessage(message);
+                    }
+
                 }
             });
         } else {

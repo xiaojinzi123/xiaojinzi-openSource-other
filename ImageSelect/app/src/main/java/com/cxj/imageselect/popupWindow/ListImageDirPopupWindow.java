@@ -13,7 +13,7 @@ import android.widget.PopupWindow;
 import com.cxj.imageselect.ui.SelectLocalImageAct;
 import com.cxj.imageselect.localImage.LocalImageInfo;
 import com.cxj.imageselect.localImage.LocalImageManager;
-import com.example.cxj.imageselect.R;
+import com.cxj.imageselect.R;
 
 import java.util.List;
 

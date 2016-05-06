@@ -22,7 +22,7 @@ import com.cxj.imageselect.localImage.LocalImageInfo;
 import com.cxj.imageselect.localImage.LocalImageManager;
 import com.cxj.imageselect.popupWindow.ListImageDirPopupWindow;
 import com.cxj.imageselect.util.ThreadPool;
-import com.example.cxj.imageselect.R;
+import com.cxj.imageselect.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -127,7 +127,7 @@ public class SelectLocalImageAct extends Activity implements View.OnClickListene
             MessageDataHolder m = (MessageDataHolder) msg.obj;
 
             //设置底部的信息
-            tv_folderName.setText(m.folderName);
+            tv_folderName.setText(m.folderName.length() > 12 ? m.folderName.substring(0, 12) + "..." : m.folderName);
             tv_imageNumber.setText(m.imageNum + "张");
 
             //把临时数据中的数据加入到原来的集合

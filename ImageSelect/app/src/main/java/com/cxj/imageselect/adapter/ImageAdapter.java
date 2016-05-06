@@ -6,8 +6,9 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
+import com.cxj.imageselect.R;
 import com.cxj.imageselect.localImage.LocalImageLoader;
-import com.example.cxj.imageselect.R;
+
 
 import java.util.List;
 
