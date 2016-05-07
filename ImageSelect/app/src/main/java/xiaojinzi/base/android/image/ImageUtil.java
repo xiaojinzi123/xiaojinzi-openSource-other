@@ -8,7 +8,7 @@ import xiaojinzi.base.android.os.ScreenUtils;
 
 /**
  * 有关图像的工具类
- * 1.加载本地图片,压缩的形式
+ * 功能1.加载本地图片,压缩的形式
  *
  * @author xiaojinzi
  */
@@ -73,7 +73,14 @@ public class ImageUtil {
         return inSampleSize;
     }
 
-    // 如果是放大图片，filter决定是否平滑，如果是缩小图片，filter无影响
+    /**
+     * 如果是放大图片，filter决定是否平滑，如果是缩小图片，filter无影响
+     *
+     * @param src
+     * @param dstWidth
+     * @param dstHeight
+     * @return
+     */
     private static Bitmap createScaleBitmap(Bitmap src, int dstWidth,
                                             int dstHeight) {
         if (src == null) {
@@ -96,6 +103,7 @@ public class ImageUtil {
      */
     public static BitmapFactory.Options getBitMapOptions(String localImagePath) {
         final BitmapFactory.Options options = new BitmapFactory.Options();
+        //表示不是真的加载图片的数据,只是计算了图片的大小
         options.inJustDecodeBounds = true;
         //计算出了图片的大小,没有真正的加载
         BitmapFactory.decodeFile(localImagePath, options);

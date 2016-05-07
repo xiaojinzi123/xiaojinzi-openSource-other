@@ -25,7 +25,7 @@ import xiaojinzi.base.java.util.ArrayUtil;
 /**
  * Created by cxj on 2016/5/5.
  */
-public class ListImageDirPopupWindow<T> extends PopupWindow implements View.OnTouchListener {
+public class ListImageDirPopupWindow extends PopupWindow implements View.OnTouchListener {
 
     /**
      * 布局文件的最外层View
@@ -58,6 +58,11 @@ public class ListImageDirPopupWindow<T> extends PopupWindow implements View.OnTo
      */
     private List<String> data;
 
+    /**
+     * 系统中的图片个数
+     */
+    private int systemImageNum = 0;
+
     public ListImageDirPopupWindow(View contentView, int width, int height,
                                    boolean focusable, LocalImageInfo localImageInfo) {
         super(contentView, width, height, focusable);
@@ -66,7 +71,6 @@ public class ListImageDirPopupWindow<T> extends PopupWindow implements View.OnTo
 
 
         data = ArrayUtil.setToList(localImageInfo.getImageFolders());
-
         data.add(0, "System");
 
         //根布局
@@ -114,7 +118,7 @@ public class ListImageDirPopupWindow<T> extends PopupWindow implements View.OnTo
                 //设置目录名称
                 h.setText(R.id.id_dir_item_name, item);
                 if (position == 0) { //第一个条目不是目录,特殊考虑
-                    h.setText(R.id.id_dir_item_count, localImageInfo.getImageFiles().size() + "张");
+                    h.setText(R.id.id_dir_item_count, systemImageNum + "张");
                 } else {
                     List<String> list = LocalImageManager.queryImageByFolderPath(localImageInfo,
                             item);
@@ -124,6 +128,21 @@ public class ListImageDirPopupWindow<T> extends PopupWindow implements View.OnTo
         };
         //设置适配器
         lv.setAdapter(adapter);
+    }
+
+    /**
+     * 通知数据改变
+     */
+    public void notifyDataSetChanged() {
+        List<String> list = ArrayUtil.setToList(localImageInfo.getImageFolders());
+        if (systemImageNum == 0) {
+            systemImageNum = localImageInfo.getImageFiles().size();
+        }
+        data.clear();
+        data.add("System");
+        data.addAll(list);
+        list = null;
+        adapter.notifyDataSetChanged();
     }
 
     /**

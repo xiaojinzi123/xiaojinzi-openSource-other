@@ -96,17 +96,15 @@ public class SelectLocalImageAct extends Activity implements View.OnClickListene
     /**
      * 本地图片的信息
      */
-    private LocalImageInfo localImageInfo;
+    private LocalImageInfo localImageInfo = new LocalImageInfo(new String[]{LocalImageManager.PNG_MIME_TYPE,
+            LocalImageManager.JPEG_MIME_TYPE,
+            LocalImageManager.JPG_MIME_TYPE});
+
 
     /**
      * 显示的数据u
      */
     private List<String> data = new ArrayList<String>();
-
-    /**
-     * 临时数据
-     */
-    private List<String> tmpData;
 
     /**
      * 记录图片是不是被选中,利用下标进行关联
@@ -130,23 +128,22 @@ public class SelectLocalImageAct extends Activity implements View.OnClickListene
             tv_folderName.setText(m.folderName.length() > 12 ? m.folderName.substring(0, 12) + "..." : m.folderName);
             tv_imageNumber.setText(m.imageNum + "张");
 
-            //把临时数据中的数据加入到原来的集合
-            data.clear();
-            data.addAll(tmpData);
-            tmpData = null;
-
             //初始化选中状态的记录集合
             imageStates.clear();
-            for (int i = 0; i < data.size(); i++) {
+            for (int i = 0; i < localImageInfo.getImageFiles().size(); i++) {
                 imageStates.add(false);
             }
 
-            if (listImageDirPopupWindow != null) {
-                listImageDirPopupWindow.dismiss();
-                setBackAlpha(false);
-            }
+            data.clear();
+            data.addAll(localImageInfo.getImageFiles());
 
+            //关闭弹出窗口
+            listImageDirPopupWindow.dismiss();
+            setBackAlpha(false);
+
+            //通知数据改变
             adapter.notifyDataSetChanged();
+            listImageDirPopupWindow.notifyDataSetChanged();
 
         }
     };
@@ -161,9 +158,8 @@ public class SelectLocalImageAct extends Activity implements View.OnClickListene
         //初始化控件
         initView();
 
+        //初始化事件
         initEvent();
-
-        rv.setLayoutManager(new GridLayoutManager(this, 3));
 
         //线程池执行任务
         ThreadPool.getInstance().invoke(this);
@@ -195,8 +191,10 @@ public class SelectLocalImageAct extends Activity implements View.OnClickListene
      * 初始化控件
      */
     private void initView() {
+
         context = this;
 
+        //寻找一些控件
         iv_back = (ImageView) findViewById(R.id.iv_act_main_back);
         tv_ok = (TextView) findViewById(R.id.tv_act_main_ok);
 
@@ -204,12 +202,17 @@ public class SelectLocalImageAct extends Activity implements View.OnClickListene
         tv_folderName = (TextView) findViewById(R.id.tv_act_main_image_folder_name);
         tv_imageNumber = (TextView) findViewById(R.id.tv_act_main_image_number);
 
-
         rv = (RecyclerView) findViewById(R.id.rv);
         //创建适配器
         adapter = new ImageAdapter(context, data, imageStates);
         //设置适配器
         rv.setAdapter(adapter);
+
+        rv.setLayoutManager(new GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false));
+
+        //初始化弹出窗口
+        initPopuWindow();
+
     }
 
 
@@ -261,9 +264,11 @@ public class SelectLocalImageAct extends Activity implements View.OnClickListene
             ThreadPool.getInstance().invoke(new Runnable() {
                 @Override
                 public void run() {
-                    tmpData = LocalImageManager.queryImageByFolderPath(localImageInfo, folderPath);
+                    List<String> tmpData = LocalImageManager.queryImageByFolderPath(localImageInfo, folderPath);
+                    localImageInfo.getImageFiles().clear();
+                    localImageInfo.getImageFiles().addAll(tmpData);
                     //发送消息
-                    h.sendMessage(MessageDataHolder.obtain(folderPath, tmpData.size()));
+                    h.sendMessage(MessageDataHolder.obtain(folderPath, localImageInfo.getImageFiles().size()));
                 }
             });
 
@@ -272,39 +277,37 @@ public class SelectLocalImageAct extends Activity implements View.OnClickListene
 
     @Override
     public void run() {
+
         //初始化本地图片的管理者
         LocalImageManager.init(context);
 
-        if (localImageInfo == null) {
-            //获取本地图片的信息
-            localImageInfo = LocalImageManager.
-                    queryImageWithFolder(LocalImageManager.PNG_MIME_TYPE, LocalImageManager.JPEG_MIME_TYPE, LocalImageManager.JPG_MIME_TYPE);
+        //获取本地系统图片的信息,并且整理文件夹
+        LocalImageManager.
+                queryImageWithFolder(localImageInfo);
 
-        }
-
-        //拿到数据
-        tmpData = localImageInfo.getImageFiles();
-
-        if (listImageDirPopupWindow == null) {
-            //初始化弹出框
-            View contentView = View.inflate(context, R.layout.list_dir, null);
-            //创建要弹出的popupWindow
-            listImageDirPopupWindow = new ListImageDirPopupWindow(contentView,
-                    ScreenUtils.getScreenWidth(context),
-                    ScreenUtils.getScreenHeight(context) * 2 / 3,
-                    true, localImageInfo);
-
-            //消失的时候监听
-            listImageDirPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-                @Override
-                public void onDismiss() {
-                    setBackAlpha(false);
-                }
-            });
-
-        }
         //发送消息
-        h.sendMessage(MessageDataHolder.obtain("所有文件", tmpData.size()));
+        h.sendMessage(MessageDataHolder.obtain("所有文件", localImageInfo.getImageFiles().size()));
+    }
+
+    /**
+     * 初始化弹出的窗口
+     */
+    private void initPopuWindow() {
+        //初始化弹出框
+        View contentView = View.inflate(context, R.layout.list_dir, null);
+        //创建要弹出的popupWindow
+        listImageDirPopupWindow = new ListImageDirPopupWindow(contentView,
+                ScreenUtils.getScreenWidth(context),
+                ScreenUtils.getScreenHeight(context) * 2 / 3,
+                true, localImageInfo);
+
+        //消失的时候监听
+        listImageDirPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                setBackAlpha(false);
+            }
+        });
     }
 
     /**
@@ -331,7 +334,7 @@ public class SelectLocalImageAct extends Activity implements View.OnClickListene
         List<String> tmp = new ArrayList<String>();
         for (int i = 0; i < imageStates.size(); i++) {
             if (imageStates.get(i)) {
-                tmp.add(data.get(i));
+                tmp.add(localImageInfo.getImageFiles().get(i));
             }
         }
         String[] arr = new String[tmp.size()];

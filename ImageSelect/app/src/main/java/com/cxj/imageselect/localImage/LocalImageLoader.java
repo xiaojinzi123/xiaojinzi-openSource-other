@@ -11,6 +11,9 @@ import com.cxj.imageselect.util.ThreadPool;
 
 import xiaojinzi.base.android.image.ImageUtil;
 
+/**
+ * 本地的图片加载器
+ */
 public class LocalImageLoader {
 
     private static ThreadPool threadPool;
@@ -38,7 +41,6 @@ public class LocalImageLoader {
             if (imageView.getTag().toString().equals(path)) {
                 imageView.setImageBitmap(bm);
             } else {
-//                System.out.println("不同");
             }
         }
     };
@@ -78,7 +80,7 @@ public class LocalImageLoader {
                 @Override
                 public void run() {
                     LayoutParams lp = imageView.getLayoutParams();
-                    //获取本地的图片
+                    //获取本地的图片的压缩图
                     Bitmap bm = ImageUtil.decodeLocalImage(imageLocalPath, lp.width, lp.height);
                     if (bm != null) {
                         //添加到一级缓存
@@ -115,6 +117,9 @@ public class LocalImageLoader {
     }
 
 
+    /**
+     * 几个信息的持有者,其实就是封装一下
+     */
     private class ImgBeanHolder {
         Bitmap bitmap;
         ImageView imageView;
